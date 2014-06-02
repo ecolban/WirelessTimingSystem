@@ -30,7 +30,7 @@ public class WTS_Timer extends JPanel implements Runnable, ActionListener {
 	private boolean localHigh = false;
 	private boolean remoteHigh = false;
 	private PrintWriter out;
-	private static final Pattern EVENT_PATTERN = Pattern.compile("(local|remote):(true|false)");
+	private static final Pattern EVENT_PATTERN = Pattern.compile("(local|remote):(high|low)");
 
 	public static void main(String[] args) throws IOException {
 		if (args.length != 1 || !args[0].matches("[1-2]")) {
@@ -46,8 +46,7 @@ public class WTS_Timer extends JPanel implements Runnable, ActionListener {
 
 	private static void printUsage() {
 		System.out.println("Usage: java -jar WirelessTimingSystem.jar N"
-				+ "\nN is a number between 1 and 2 identifying"
-				+ " the RPi that is the source of events.");
+				+ "\nN is a number between 1 and 2 identifying the source of events.");
 	}
 
 	private void listen(String host, int serverPort) {
@@ -70,7 +69,7 @@ public class WTS_Timer extends JPanel implements Runnable, ActionListener {
 					if (m.matches()) {
 						String source = m.group(1);
 						String state = m.group(2);
-						changeState(source, Boolean.parseBoolean(state));
+						changeState(source, state);
 					}
 				}
 			}
@@ -165,17 +164,17 @@ public class WTS_Timer extends JPanel implements Runnable, ActionListener {
 		}
 	}
 
-	private void changeState(String source, boolean high) {
+	private void changeState(String source, String state) {
 		if (source.equals("local")) {
-			localHigh = high;
+			localHigh = state.equals("high");
 		} else if (source.equals("remote")) {
-			remoteHigh = high;
+			remoteHigh = state.equals("high");
 		}
-		if (armed && source.equals("local") && !high) {
+		if (armed && source.equals("local") && !localHigh) {
 			start = System.currentTimeMillis();
 			running = true;
 			armed = false;
-		} else if (running && source.equals("remote") && !high) {
+		} else if (running && source.equals("remote") && !remoteHigh) {
 			running = false;
 		}
 	}
