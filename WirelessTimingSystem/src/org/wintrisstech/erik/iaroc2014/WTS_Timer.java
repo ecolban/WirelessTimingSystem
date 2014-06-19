@@ -215,7 +215,7 @@ public class WTS_Timer extends JPanel implements Runnable, ActionListener {
 	}
 
 	/**
-	 * Toggles between manual and automatic mode
+	 * Toggles between manual and automatic mode.
 	 */
 	private synchronized void toggleManualMode() {
 		manualMode = !manualMode;
